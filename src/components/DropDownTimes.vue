@@ -15,7 +15,8 @@ export default {
     data() {
         return {
             selected_item: null,
-            times: []
+            times_work: [],
+            temp: []
         }
     },
     props: {
@@ -56,39 +57,41 @@ export default {
             if (element < 10) {
                 str_time = "0" + element.toString()
             }
-            this.times.push({ hour: str_time + ":00", bool: false })
-            this.times.push({ hour: str_time + ":30", bool: false })
-
+            if (element < 8 || element > 20) {
+                this.times_work.push({ hour: str_time + ":00", bool: true })
+                this.times_work.push({ hour: str_time + ":30", bool: true })
+            } else {
+                this.times_work.push({ hour: str_time + ":00", bool: false })
+                this.times_work.push({ hour: str_time + ":30", bool: false })
+            }
         }
+        this.temp = JSON.parse(JSON.stringify(this.times_work)) // depp copy
     },
     computed: {
         _times() {
-            const items = this.times
+            let items = JSON.parse(JSON.stringify(this.temp)) // depp copy
             if (!this.date)
                 return []
-            console.log(this.appointments, this.hair_style, this.date.getDate());
-
             const day = this.date.getDate() < 10 ? "0" + this.date.getDate().toString() : this.date.getDate();
             const month = this.date.getMonth() + 1 < 10 ? "0" + (this.date.getMonth() + 1).toString() : this.date.getMonth() + 1;
             const year = this.date.getFullYear();
             const _date = `${year}-${month}-${day}`;
             const current_appointments = this.appointments[this.hair_style][_date]
             console.log(current_appointments);
+            console.log(items, this.times_work);
             if (!current_appointments)
-                return this.times
+                return items
             const arr = Object.values(current_appointments)
-
             arr.forEach(item => {
-                console.log(item.start_time);
                 const current_item_time = item.start_time.toString().split(":")
-                console.log(parseInt(current_item_time[0]) * 2 + 1);
                 if (current_item_time[1] == "30")
-                    this.times[parseInt((current_item_time[0]) * 2) + 1].bool = true
+                    items[parseInt((current_item_time[0]) * 2) + 1].bool = true
                 else {
-                    this.times[parseInt((current_item_time[0]) * 2)].bool = true
+                    items[parseInt((current_item_time[0]) * 2)].bool = true
                 }
 
             })
+            console.log(items);
             return items
         }
     }
