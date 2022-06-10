@@ -77,8 +77,6 @@ export default {
             const year = this.date.getFullYear();
             const _date = `${year}-${month}-${day}`;
             const current_appointments = this.appointments[this.hair_style][_date]
-            console.log(current_appointments);
-            console.log(items, this.times_work);
             if (!current_appointments)
                 return items
             const arr = Object.values(current_appointments)
@@ -91,7 +89,6 @@ export default {
                 }
 
             })
-            console.log(items);
             return items
         }
     }
