@@ -3,17 +3,18 @@
     <h5 style="float: left; margin-left: 2rem;"> views :
       {{ user_watch }}</h5>
     <div class="container">
-      <div class="row g-0">
+      <div class="row g-0" style="margin-top:1rem ;">
         <div class="col-sm-6 col-md-8"></div>
-        <div class="col-6 col-md-4"><button type="button" @click="login()" class="btn btn-info"
+        <div class="col-6 col-md-4"><button type="button" @click="login()" class="btn btn-primary"
             style="float: right;">Login</button>
         </div>
       </div>
-      <div style="text-align:center">
+      <div style="text-align:center; ">
         <img src="../assets/barbershop_icon.png" style="max-width:12.5rem ;text-align:center" />
       </div>
       <div class="unit">
-        <div class="row row-cols-2 row-cols-lg-6 g-2 g-lg-3" style="margin: 10rem;">
+        <h1 style="text-align:center; color: white; margin-top: 1rem;"> Book an Appointment</h1>
+        <div class="row row-cols-2 row-cols-lg-6 g-2 g-lg-3" style="margin: 6rem;">
           <div class="col">
             <button v-on:click="saveAppointment()" class="btn btn-primary"
               :disabled="!(date && selected_hairStyle && selected_time && customer_name && phone_number)">Save</button>
@@ -121,12 +122,11 @@ export default {
       const response = await this.axios.post("http://localhost:3000/api/appointment/insert_new_one", payload)
       console.log(response);
       if (response.data == "success") {
-        location.reload();
+        this.$router.go()
 
       }
       else {
         this.error = response.data
-
       }
     },
     selectHairStyles(item) {

@@ -23,15 +23,27 @@
             <div v-if="pageClick == 'Home'">
                 <div>
                     <div class="container" style="text-align:center">
-
                         <img src="../assets/barbershop_icon.png" style="max-width:12.5rem; " />
-                        <Datepicker v-model="date" v-on:click="datePickerChange()" />
+                        <div class="row g-0">
+                            <div class="col-sm-6 col-md-2">
+                                <h5 style="text-align:center ">Choose Date : </h5>
+                            </div>
+                            <div class="col-6 col-md-10">
+                                <Datepicker v-model="date" v-on:click="datePickerChange()" />
+                            </div>
+                        </div>
+
+                        <HairStyleAppointments :disabled_bool="(date)" :date=date :appointments="appointments"
+                            :hairStyles="hairStyles" />
                     </div>
                 </div>
             </div>
             <div v-else-if="pageClick == 'Graph'">
-                <div>Graph</div>
-
+                <div class="container" style="text-align:center">
+                    <div style="text-align:center">
+                        <Graph :date="graphDate" />
+                    </div>
+                </div>
             </div>
             <div v-else-if="pageClick == 'Register'">
                 <RegisterPage />
@@ -46,12 +58,15 @@
 import firebase from 'firebase/compat/app'
 import "firebase/compat/auth"
 import RegisterPage from './RegisterPage.vue'
+import HairStyleAppointments from '../components/HairStyleAppointments.vue'
+import Graph from './Graph.vue'
+
 import Datepicker from '@vuepic/vue-datepicker';
 import '@vuepic/vue-datepicker/dist/main.css'
 
 export default {
     components: {
-        RegisterPage, Datepicker
+        RegisterPage, Datepicker, HairStyleAppointments, Graph
     },
     name: 'HomePageHairStyles',
     data() {
@@ -59,10 +74,12 @@ export default {
             name: "",
             pageClick: "Home",
             date: null,
+            appointments: {},
+            hairStyles: []
 
         }
     },
-    mounted() {
+    async mounted() {
         const auth = firebase.auth();
         auth.onAuthStateChanged((user) => {
             console.log(user);
@@ -73,9 +90,72 @@ export default {
 
             }
         })
-
+        await this.getHairStyle()
+        await this.getAppointments()
     },
     methods: {
+        merge: function (left, right) {
+            let arr = []
+            // Break out of loop if any one of the array gets empty
+            while (left.length && right.length) {
+                // Pick the smaller among the smallest element of left and right sub arrays 
+                if (parseInt(left[0].start_time.split(":")[0]) < parseInt(right[0].start_time.split(":")[0])) {
+                    arr.push(left.shift())
+                } else if (parseInt(left[0].start_time.split(":")[0]) === parseInt(right[0].start_time.split(":")[0])) {
+                    if (parseInt(left[0].start_time.split(":")[1]) < parseInt(right[0].start_time.split(":")[1])) {
+                        arr.push(left.shift())
+                    } else {
+                        arr.push(right.shift())
+                    }
+                } else {
+                    arr.push(right.shift())
+
+                }
+            }
+
+            // Concatenating the leftover elements
+            // (in case we didn't go through the entire left or right array)
+            return [...arr, ...left, ...right]
+        },
+        mergeSort(array) {
+            const half = array.length / 2
+
+            // Base case or terminating case
+            if (array.length < 2) {
+                return array
+            }
+
+            const left = array.splice(0, half)
+            return this.merge(this.mergeSort(left), this.mergeSort(array))
+        },
+        async getAppointments() {
+            const appointmentResponse = await this.axios.get("http://localhost:3000/api/appointment")
+
+
+            const appointmentData = appointmentResponse.data.getAll
+            for (const appointment of appointmentData) {
+                const _date = appointment["date"].split("T")[0]
+                if (!(_date in this.appointments[appointment["hair_style_name"]])) {
+                    this.appointments[appointment["hair_style_name"]][_date] = []
+                }
+                this.appointments[appointment["hair_style_name"]][_date].push(appointment)
+            }
+            for (const hairStyle in this.appointments) {
+                for (const date in this.appointments[hairStyle]) {
+                    const arr = this.mergeSort(Object.values(this.appointments[hairStyle][date]));
+                    this.appointments[hairStyle][date] = arr
+                    console.log(arr);
+                }
+            }
+        },
+        async getHairStyle() {
+            const hairStylesResponse = await this.axios.get("http://localhost:3000/api/hair_style")
+            const hairStylesData = hairStylesResponse.data
+            for (const hairStyle of hairStylesData) {
+                this.appointments[hairStyle["hair_style_name"]] = {}
+                this.hairStyles.push(hairStyle["hair_style_name"])
+            }
+        },
         datePickerChange() {
             const format = (date) => {
                 const day = date.getDate();
@@ -83,7 +163,9 @@ export default {
                 const year = date.getFullYear();
                 return `${day}/${month}/${year}`;
             }
-            return format
+            return {
+                format,
+            }
 
         },
         changePage(val) {
