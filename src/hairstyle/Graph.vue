@@ -54,20 +54,17 @@ export default ({
         async datePickerChange() {
             this.showGraph = false
             let items = []
-            console.log(this.date);
             let start_date = this.date[0]
             let day = start_date.getDate() < 10 ? "0" + start_date.getDate().toString() : start_date.getDate();
             let month = start_date.getMonth() + 1 < 10 ? "0" + (start_date.getMonth() + 1).toString() : start_date.getMonth() + 1;
             let year = start_date.getFullYear();
             start_date = `${year}-${month}-${day}`;
-            console.log(start_date);
 
             let end_date = this.date[1]
             day = end_date.getDate() < 10 ? "0" + end_date.getDate().toString() : end_date.getDate();
             month = end_date.getMonth() + 1 < 10 ? "0" + (end_date.getMonth() + 1).toString() : end_date.getMonth() + 1;
             year = end_date.getFullYear();
             end_date = `${year}-${month}-${day}`;
-            console.log(start_date, end_date);
 
             const payload = {
                 "start_date": start_date,
@@ -75,14 +72,12 @@ export default ({
             }
             const response = await this.axios.post("http://localhost:3000/api/appointment/best_haircut", payload)
             items = response.data
-            console.log(items);
             this.data = []
             const arr = []
             for (const item of items) {
                 arr.push({ "name": item["hair_style_name"], "pl": item["num_appointments"] })
             }
             this.data = arr
-            console.log(this.data);
 
             this.showGraph = true
         },

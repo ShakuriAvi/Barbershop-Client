@@ -33,7 +33,7 @@
               :hair_style="selected_hairStyle" @selectTime="selectTime($event)" />
           </div>
           <div class="col">
-            <Datepicker v-model="date" :format="format" />
+            <Datepicker :disabled="!(selected_hairStyle)" v-model="date" :format="format" />
           </div>
           <div class="col">
             <DropDownHairStyle :names="hairStyles" @selectHairStyles="selectHairStyles($event)" />
@@ -120,7 +120,6 @@ export default {
         "phone": this.phone_number
       }
       const response = await this.axios.post("http://localhost:3000/api/appointment/insert_new_one", payload)
-      console.log(response);
       if (response.data == "success") {
         this.$router.go()
 
@@ -159,7 +158,6 @@ export default {
       for (const hairStyle in this.appointments) {
         for (const date in this.appointments[hairStyle]) {
           const arr = this.mergeSort(Object.values(this.appointments[hairStyle][date]));
-          console.log(arr);
         }
       }
     },
@@ -199,7 +197,6 @@ export default {
       return this.merge(this.mergeSort(left), this.mergeSort(array))
     },
     login() {
-      console.log("/login");
       this.$router.replace({ path: '/hairstyle/login' });
 
     }

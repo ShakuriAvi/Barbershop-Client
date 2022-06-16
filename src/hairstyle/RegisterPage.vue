@@ -43,7 +43,6 @@ export default {
                 "phone": this.phone_number
             }
             const response = await this.axios.post("http://localhost:3000/api/hair_style/insert_new_one", payload)
-            console.log(response);
             if (response.data == "success") {
                 this.$router.replace({ path: '/finish' });
 

@@ -1,6 +1,6 @@
 <template>
     <div v-if="disabled_bool">
-        <table class="table" style="margin-top: 2rem; background-color: #EA7B83 ;">
+        <table class="table" style="margin-top: 2rem; background-color:blueviolet;">
             <thead>
                 <tr style="color:white ;">
                     <th style=" color:white ; font-weight: bold;" scope=" col" v-for="hairstyle in hairStyles"
@@ -12,7 +12,10 @@
             <tbody>
                 <tr v-for="(appointments, index) in _appointments" :key="index">
                     <th style="color:white ;" v-for=" appointment of appointments" :key="appointment">
-                        {{ appointment }}
+                        <span v-if="appointment != ''">{{ `${appointment.start_time} - ${appointment.end_time} :
+                                                    ${appointment.customer_name} - ${appointment.phone}`
+                        }} <button type="button" @click="deleteAppointment(appointment)"
+                                class="btn btn-danger">Delete</button></span>
                     </th>
                 </tr>
             </tbody>
@@ -55,8 +58,11 @@ export default {
         }
     },
     methods: {
-        selectTime() {
-            // this.$emit("selectTime", this.selected_item)
+        async deleteAppointment(item) {
+            const payload = item
+            const response = await this.axios.put("http://localhost:3000/api/appointment/delete_one", payload)
+            this.$router.go()
+
         }
     },
     mounted() {
@@ -84,13 +90,12 @@ export default {
                     if (obj[hairStyle][_date] && obj[hairStyle][_date][index]) {
                         const appointment = obj[hairStyle][_date][index]
                         const str = `${appointment.start_time} - ${appointment.end_time} : ${appointment.customer_name} - ${appointment.phone}`
-                        items[index].push(str)
+                        items[index].push(appointment)
                     } else {
                         items[index].push("")
                     }
                 }
             }
-            console.log(items);
             return items
         }
     },

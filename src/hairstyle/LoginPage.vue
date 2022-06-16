@@ -36,7 +36,6 @@ export default {
     mounted() {
         const auth = firebase.auth();
         auth.onAuthStateChanged((user) => {
-            console.log(user);
             if (user) {
                 this.$router.replace({ path: '/hairstyle/' });
             } else {
@@ -47,7 +46,6 @@ export default {
     },
     methods: {
         homePage() {
-            console.log("/homePage");
             this.$router.replace({ path: '/' });
         },
         onSubmit(e) {

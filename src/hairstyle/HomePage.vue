@@ -82,7 +82,6 @@ export default {
     async mounted() {
         const auth = firebase.auth();
         auth.onAuthStateChanged((user) => {
-            console.log(user);
             if (user) {
                 this.name = user.email.split("@")[0]
             } else {
@@ -144,7 +143,6 @@ export default {
                 for (const date in this.appointments[hairStyle]) {
                     const arr = this.mergeSort(Object.values(this.appointments[hairStyle][date]));
                     this.appointments[hairStyle][date] = arr
-                    console.log(arr);
                 }
             }
         },
@@ -169,13 +167,11 @@ export default {
 
         },
         changePage(val) {
-            console.log(val);
             this.pageClick = val
         },
         logout() {
             const auth = firebase.auth();
             auth.signOut().then(() => {
-                console.log("sign out");
                 this.$router.replace({ path: '/hairstyle/login' });
 
             }).catch(err => {
