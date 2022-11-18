@@ -1,7 +1,7 @@
 <template>
     <div>
         <div style="text-align:center; margin-bottom: 2rem;">
-            <h1 style="color:red ;"> Best Hair Style</h1>
+            <h1 style="color:red ;"> Best Hair Stylist</h1>
         </div>
         <div class="row g-0">
             <div class="col-sm-6 col-md-2">
